@@ -180,11 +180,12 @@ class ModelRunner:
             if not seq.block_table:
                 continue  # 如果没有 block_table，跳过后续 slot_mapping 处理
             # 遍历本轮需要写入 KV cache 的 block
-            for i in range(seq.num_cached_blocks, seq.num_blocks):
+            for i in range(seq.num_cached_blocks, seq.num_blocks): # seq.num_cached_blocks 表示已经缓存的 block 数，seq.num_blocks 表示总 block 数
+                # 意味着索引 0 到 num_cached_blocks - 1 的块完全不会进入循环
                 start = seq.block_table[i] * self.block_size
-                if i != seq.num_blocks - 1:
+                if i != seq.num_blocks - 1: # 不是最后一个 block
                     end = start + self.block_size
-                else:
+                else: # 最后一个 block 可能不满，需要特殊处理
                     end = start + seq.last_block_num_tokens  # 最后一个 block 可能不满
                 slot_mapping.extend(list(range(start, end)))  # 记录每个 token 的物理位置
 
